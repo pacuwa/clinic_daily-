@@ -8,12 +8,17 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
-// 1. Prefer DATABASE_URL for production (Render / Managed PostgreSQL)
-// 2. Fall back to individual DB_* variables for local development
-const dbConfig = process.env.DATABASE_URL
+const connectionString = process.env.DATABASE_URL;
+
+// Determine if connection requires SSL:
+// - Render External URLs contain '.render.com' and require SSL ({ rejectUnauthorized: false }).
+// - Render Internal URLs (e.g., 'dpg-xxxxx-a') do NOT require SSL (ssl: false).
+const requiresSsl = connectionString && connectionString.includes('.render.com');
+
+const dbConfig = connectionString
   ? {
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }, // Required by Render PostgreSQL
+      connectionString: connectionString,
+      ssl: requiresSsl ? { rejectUnauthorized: false } : false,
     }
   : {
       host: process.env.DATABASE_HOST || 'localhost',
