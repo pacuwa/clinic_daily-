@@ -12,7 +12,7 @@
         <div class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="inventory.html">Inventory</a>
-            <a href="stock-in.html" id="stockInLink">Stock In</a>
+            <a href="stock-in.html">Stock In</a>
             <a href="stock-out.html">Stock Out</a>
             <a href="reports.html">Reports</a>
             <a href="settings.html" class="active">Settings</a>
@@ -29,8 +29,8 @@
         <!-- User Management Section -->
         <div class="card" id="userManagementSection" style="display: none;">
             <div class="card-header">
-                <h2>User Management</h2>
-                <button class="btn btn-primary" onclick="openAddUserModal()">+ Add User</button>
+                <h2>👥 User Management</h2>
+                <button class="btn btn-primary" onclick="openAddUserModal()">+ Add New User</button>
             </div>
 
             <div class="table-wrap">
@@ -38,7 +38,7 @@
                     <thead>
                         <tr>
                             <th>Email</th>
-                            <th>Name</th>
+                            <th>Full Name</th>
                             <th>Role</th>
                             <th>Status</th>
                             <th>Created</th>
@@ -55,7 +55,7 @@
         <!-- Change Password Section -->
         <div class="card">
             <div class="card-header">
-                <h2>Change Password</h2>
+                <h2>🔐 Change Password</h2>
             </div>
             <form id="changePasswordForm" style="max-width: 400px;">
                 <div class="form-group">
@@ -65,6 +65,7 @@
                 <div class="form-group">
                     <label for="newPassword">New Password *</label>
                     <input type="password" id="newPassword" name="newPassword" required>
+                    <small style="color: #999;">Minimum 6 characters</small>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password *</label>
@@ -85,16 +86,16 @@
             <div class="modal-body">
                 <form id="addUserForm">
                     <div class="form-group">
-                        <label for="userEmail">Email *</label>
-                        <input type="email" id="userEmail" name="userEmail" required>
+                        <label for="userEmail">Email Address *</label>
+                        <input type="email" id="userEmail" name="userEmail" placeholder="user@example.com" required>
                     </div>
                     <div class="form-group">
                         <label for="userPassword">Password *</label>
-                        <input type="password" id="userPassword" name="userPassword" required>
+                        <input type="password" id="userPassword" name="userPassword" placeholder="Minimum 6 characters" required>
                     </div>
                     <div class="form-group">
                         <label for="userFullName">Full Name *</label>
-                        <input type="text" id="userFullName" name="userFullName" required>
+                        <input type="text" id="userFullName" name="userFullName" placeholder="John Doe" required>
                     </div>
                     <div class="form-group">
                         <label for="userRole">Role *</label>

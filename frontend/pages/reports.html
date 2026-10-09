@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - Clinic Daily</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <nav>
@@ -15,6 +17,7 @@
             <a href="stock-in.html">Stock In</a>
             <a href="stock-out.html">Stock Out</a>
             <a href="reports.html" class="active">Reports</a>
+            <a href="settings.html">Settings</a>
             <span style="margin-left: 20px;">|</span>
             <span style="margin-left: 20px; font-size: 12px;">User: <span id="userEmail"></span></span>
             <a href="#" onclick="logout()">Logout</a>
@@ -32,10 +35,60 @@
             </div>
         </div>
 
+        <!-- Category Report -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📂 Today's Sales by Category</h2>
+                <button class="btn btn-sm btn-success" onclick="exportDailyCategoryCSV()">📥 Export CSV</button>
+            </div>
+            <p style="font-weight: bold; color: #667eea;"></p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Quantity Sold</th>
+                            <th>Transactions</th>
+                            <th>Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Item Report -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📦 Today's Sales by Item</h2>
+                <button class="btn btn-sm btn-success" onclick="exportDailyItemsCSV()">📥 Export CSV</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total Sales</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemTableBody">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Weekly Report -->
         <div class="card">
             <div class="card-header">
                 <h2>📈 Weekly Report (Last 7 Days)</h2>
+                <button class="btn btn-sm btn-danger" onclick="exportWeeklyReportPDF()">📄 Export PDF</button>
             </div>
             <p id="weeklySummary" style="font-weight: bold; color: #667eea;"></p>
             <div class="table-wrap">

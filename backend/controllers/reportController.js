@@ -139,6 +139,7 @@ const getStockLevelsReport = (req, res) => {
       unit,
       current_stock,
       reorder_level,
+      unit_cost,
       CASE
         WHEN current_stock <= reorder_level THEN 'LOW'
         WHEN current_stock <= (reorder_level * 1.5) THEN 'MODERATE'
@@ -173,4 +174,143 @@ const getStockLevelsReport = (req, res) => {
   );
 };
 
-module.exports = { getDailyReport, getWeeklyReport, getMonthlyReport, getStockLevelsReport };
+const getCategoryReport = (req, res) => {
+  const db = getDb();
+  const today = new Date().toISOString().split('T')[0];
+
+  db.all(
+    `SELECT
+      i.category,
+      COUNT(DISTINCT so.id) AS total_transactions,
+      SUM(so.quantity_out) AS total_quantity,
+      SUM(so.sale_price * so.quantity_out) AS total_sales
+    FROM stock_out so
+    JOIN items i ON so.item_id = i.id
+    WHERE DATE(so.date_out) = ?
+    GROUP BY i.category
+    ORDER BY total_sales DESC`,
+    [today],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Unable to generate category report.' });
+      }
+
+      const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
+      const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity || 0), 0);
+
+      return res.json({
+        message: 'Category report generated successfully',
+        data: {
+          report_date: today,
+          categories: rows || [],
+          summary: {
+            total_quantity: totalQuantity,
+            total_sales: totalSales,
+            total_categories: rows.length
+          }
+        }
+      });
+    }
+  );
+};
+
+const getItemReport = (req, res) => {
+  const db = getDb();
+  const today = new Date().toISOString().split('T')[0];
+
+  db.all(
+    `SELECT
+      i.id,
+      i.item_name,
+      i.category,
+      COUNT(DISTINCT so.id) AS total_transactions,
+      SUM(so.quantity_out) AS total_quantity,
+      i.unit_cost,
+      SUM(so.sale_price) AS total_sale_price,
+      SUM(so.sale_price * so.quantity_out) AS total_sales
+    FROM stock_out so
+    JOIN items i ON so.item_id = i.id
+    WHERE DATE(so.date_out) = ?
+    GROUP BY i.id, i.item_name, i.category, i.unit_cost
+    ORDER BY total_sales DESC`,
+    [today],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Unable to generate item report.' });
+      }
+
+      const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
+      const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity || 0), 0);
+      const totalProfit = rows.reduce((sum, row) => {
+        const cost = (row.unit_cost || 0) * (row.total_quantity || 0);
+        const sales = row.total_sales || 0;
+        return sum + (sales - cost);
+      }, 0);
+
+      return res.json({
+        message: 'Item report generated successfully',
+        data: {
+          report_date: today,
+          items: rows || [],
+          summary: {
+            total_quantity: totalQuantity,
+            total_sales: totalSales,
+            total_profit: totalProfit,
+            total_items_sold: rows.length
+          }
+        }
+      });
+    }
+  );
+};
+
+const getWeeklyDetailedReport = (req, res) => {
+  const db = getDb();
+
+  db.all(
+    `SELECT
+      DATE(date_out) AS report_date,
+      i.category,
+      SUM(so.quantity_out) AS total_quantity,
+      SUM(so.sale_price * so.quantity_out) AS total_sales
+    FROM stock_out so
+    JOIN items i ON so.item_id = i.id
+    WHERE date_out >= datetime('now', '-7 days')
+    GROUP BY DATE(date_out), i.category
+    ORDER BY report_date DESC, total_sales DESC`,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Unable to generate weekly detailed report.' });
+      }
+
+      const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
+      const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity || 0), 0);
+
+      return res.json({
+        message: 'Weekly detailed report generated successfully',
+        data: {
+          period: 'Last 7 days',
+          breakdown: rows || [],
+          summary: {
+            total_quantity: totalQuantity,
+            total_sales: totalSales
+          }
+        }
+      });
+    }
+  );
+};
+
+module.exports = {
+  getDailyReport,
+  getWeeklyReport,
+  getMonthlyReport,
+  getStockLevelsReport,
+  getCategoryReport,
+  getItemReport,
+  getWeeklyDetailedReport
+};
