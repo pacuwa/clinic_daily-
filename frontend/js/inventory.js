@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
+    const user = checkAuth();
+    if (!user) return;
+
+    const userEmail = document.getElementById('userEmail');
+    if (userEmail) userEmail.textContent = user.email;
+
     loadInventory();
     setNavigationActive('inventory');
 
@@ -34,7 +39,7 @@ async function loadInventory() {
                     </span>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-secondary" onclick="editItem(${item.id})">Edit</button>
+                    ${isAdmin() ? `<button class="btn btn-sm btn-secondary" onclick="editItem(${item.id})">Edit</button>` : ''}
                 </td>
             </tr>
         `).join('');
@@ -105,3 +110,4 @@ function showSuccess(message) {
 window.openAddItemModal = openAddItemModal;
 window.closeAddItemModal = closeAddItemModal;
 window.editItem = editItem;
+window.showSuccess = showSuccess;

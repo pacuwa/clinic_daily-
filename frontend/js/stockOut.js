@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
+    const user = checkAuth();
+    if (!user) return;
+
+    const userEmail = document.getElementById('userEmail');
+    if (userEmail) userEmail.textContent = user.email;
+
     loadStockOutPage();
     setNavigationActive('stock-out');
 });
@@ -47,10 +52,10 @@ document.getElementById('stockOutForm').addEventListener('submit', async (e) => 
         await apiRequest('/stock-out', 'POST', formData);
         document.getElementById('stockOutForm').reset();
         document.getElementById('availableStock').textContent = '0';
-        alert('Stock out recorded successfully!');
+        showSuccess('Stock out recorded successfully!');
         loadStockOutHistory();
     } catch (error) {
-        alert('Error: ' + error.message);
+        showError('Error: ' + error.message);
     }
 });
 
@@ -80,4 +85,14 @@ async function loadStockOutHistory() {
     }
 }
 
+function showError(message) {
+    alert(message);
+}
+
+function showSuccess(message) {
+    alert(message);
+}
+
 window.addEventListener('load', loadStockOutHistory);
+window.showError = showError;
+window.showSuccess = showSuccess;

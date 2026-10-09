@@ -5,6 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const userEmail = document.getElementById('userEmail');
     if (userEmail) userEmail.textContent = user.email;
 
+    // Hide Stock In link for Staff
+    if (!isAdmin()) {
+        const stockInLink = document.getElementById('stockInLink');
+        if (stockInLink) {
+            stockInLink.style.display = 'none';
+        }
+    }
+
     loadDashboardData();
     setNavigationActive('dashboard');
 });

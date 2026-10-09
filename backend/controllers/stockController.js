@@ -7,6 +7,10 @@ const recordStockIn = (req, res) => {
     return res.status(400).json({ message: 'Item ID and quantity are required.' });
   }
 
+  if (quantity_in <= 0) {
+    return res.status(400).json({ message: 'Quantity must be greater than 0.' });
+  }
+
   const db = getDb();
 
   db.get('SELECT * FROM items WHERE id = ?', [item_id], (err, item) => {
@@ -43,10 +47,12 @@ const recordStockIn = (req, res) => {
               data: {
                 id: this.lastID,
                 item_id,
+                item_name: item.item_name,
                 quantity_in,
                 unit_cost: unit_cost || 0,
                 supplier: supplier || '',
-                notes: notes || ''
+                notes: notes || '',
+                date_in: new Date().toISOString()
               }
             });
           }
@@ -61,6 +67,14 @@ const recordStockOut = (req, res) => {
 
   if (!item_id || !quantity_out) {
     return res.status(400).json({ message: 'Item ID and quantity are required.' });
+  }
+
+  if (quantity_out <= 0) {
+    return res.status(400).json({ message: 'Quantity must be greater than 0.' });
+  }
+
+  if (sale_price < 0) {
+    return res.status(400).json({ message: 'Sale price cannot be negative.' });
   }
 
   const db = getDb();
@@ -107,8 +121,10 @@ const recordStockOut = (req, res) => {
                 item_id,
                 quantity_out,
                 sale_price: sale_price || 0,
+                total_amount: (sale_price || 0) * quantity_out,
                 sold_to: sold_to || 'Customer',
-                notes: notes || ''
+                notes: notes || '',
+                date_out: new Date().toISOString()
               }
             });
           }
@@ -120,14 +136,15 @@ const recordStockOut = (req, res) => {
 
 const getStockInHistory = (req, res) => {
   const db = getDb();
+  const limit = req.query.limit || 100;
 
   db.all(
     `SELECT si.*, i.item_name, u.full_name as received_by_name
      FROM stock_in si
      JOIN items i ON si.item_id = i.id
      JOIN users u ON si.received_by = u.id
-     ORDER BY si.date_in DESC LIMIT 100`,
-    [],
+     ORDER BY si.date_in DESC LIMIT ?`,
+    [limit],
     (err, rows) => {
       if (err) {
         console.error('Database error:', err);
@@ -144,14 +161,15 @@ const getStockInHistory = (req, res) => {
 
 const getStockOutHistory = (req, res) => {
   const db = getDb();
+  const limit = req.query.limit || 100;
 
   db.all(
     `SELECT so.*, i.item_name, u.full_name as recorded_by_name
      FROM stock_out so
      JOIN items i ON so.item_id = i.id
      JOIN users u ON so.recorded_by = u.id
-     ORDER BY so.date_out DESC LIMIT 100`,
-    [],
+     ORDER BY so.date_out DESC LIMIT ?`,
+    [limit],
     (err, rows) => {
       if (err) {
         console.error('Database error:', err);

@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
+    const user = checkAuth();
+    if (!user) return;
+
+    const userEmail = document.getElementById('userEmail');
+    if (userEmail) userEmail.textContent = user.email;
+
     if (!isAdmin()) {
         window.location.href = 'dashboard.html';
         return;
@@ -36,10 +41,10 @@ document.getElementById('stockInForm').addEventListener('submit', async (e) => {
     try {
         await apiRequest('/stock-in', 'POST', formData);
         document.getElementById('stockInForm').reset();
-        alert('Stock in recorded successfully!');
+        showSuccess('Stock in recorded successfully!');
         loadStockInHistory();
     } catch (error) {
-        alert('Error: ' + error.message);
+        showError('Error: ' + error.message);
     }
 });
 
@@ -69,4 +74,14 @@ async function loadStockInHistory() {
     }
 }
 
+function showError(message) {
+    alert(message);
+}
+
+function showSuccess(message) {
+    alert(message);
+}
+
 window.addEventListener('load', loadStockInHistory);
+window.showError = showError;
+window.showSuccess = showSuccess;

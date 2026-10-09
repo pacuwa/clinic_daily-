@@ -1,29 +1,55 @@
+const jwt = require('jsonwebtoken');
+const { jwtSecret } = require('../config/auth');
 const { getDb } = require('../config/db');
 
-const getDailyReport = (req, res) => {
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Authentication required.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid or expired token.' });
+  }
+};
+
+const authorizeAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'Admin') {
+    return next();
+  }
+
+  return res.status(403).json({ message: 'Admin access required.' });
+};
+
+const authorizeStaff = (req, res, next) => {
+  if (req.user && (req.user.role === 'Staff' || req.user.role === 'Admin')) {
+    return next();
+  }
+
+  return res.status(403).json({ message: 'Staff access required.' });
+};
+
+const checkUserStatus = (req, res, next) => {
   const db = getDb();
 
-  const query = `
-    SELECT
-      DATE(date_out) AS report_date,
-      SUM(quantity_out) AS total_quantity_out,
-      SUM(sale_price) AS total_sales
-    FROM stock_out
-    WHERE DATE(date_out) = DATE('now')
-    GROUP BY DATE(date_out)
-  `;
-
-  db.get(query, [], (err, row) => {
-    if (err) {
-      return res.status(500).json({ message: 'Unable to generate report.' });
+  db.get('SELECT status FROM users WHERE id = ?', [req.user.id], (err, user) => {
+    if (err || !user) {
+      return res.status(401).json({ message: 'User not found or access denied.' });
     }
 
-    return res.json({
-      report_date: row ? row.report_date : new Date().toISOString().split('T')[0],
-      total_quantity_out: row ? row.total_quantity_out : 0,
-      total_sales: row ? row.total_sales : 0
-    });
+    if (user.status === 'Inactive') {
+      return res.status(403).json({ message: 'Your account is inactive. Please contact admin.' });
+    }
+
+    next();
   });
 };
 
-module.exports = { getDailyReport };
+module.exports = { authenticate, authorizeAdmin, authorizeStaff, checkUserStatus };
