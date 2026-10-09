@@ -1,50 +1,92 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Stock In</title>
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
-  <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Out - Clinic Daily</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
     <nav>
-      <strong>Clinic Daily</strong>
-      <div>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="inventory.html">Inventory</a>
-        <a href="stock-in.html">Stock In</a>
-        <a href="stock-out.html">Stock Out</a>
-        <a href="reports.html">Reports</a>
-        <a href="login.html" onclick="logoutUser()">Logout</a>
-      </div>
+        <div class="logo">📊 Clinic Daily</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="inventory.html">Inventory</a>
+            <a href="stock-in.html">Stock In</a>
+            <a href="stock-out.html" class="active">Stock Out</a>
+            <a href="reports.html">Reports</a>
+            <span style="margin-left: 20px;">|</span>
+            <span style="margin-left: 20px; font-size: 12px;">User: <span id="userEmail"></span></span>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
     </nav>
 
     <div class="container">
-      <div class="card">
-        <h1>Stock In</h1>
-        <form id="stockInForm">
-          <div class="form-group">
-            <label for="itemId">Item ID</label>
-            <input id="itemId" type="number" required />
-          </div>
-          <div class="form-group">
-            <label for="quantityIn">Quantity In</label>
-            <input id="quantityIn" type="number" required />
-          </div>
-          <div class="form-group">
-            <label for="supplier">Supplier</label>
-            <input id="supplier" type="text" />
-          </div>
-          <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea id="notes" rows="4"></textarea>
-          </div>
-          <button type="submit">Record Stock In</button>
-        </form>
-      </div>
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Record Sale / Stock Out</h2>
+                </div>
+                <form id="stockOutForm">
+                    <div class="form-group">
+                        <label for="itemId">Item *</label>
+                        <select id="itemId" name="itemId" required>
+                            <option value="">-- Loading items --</option>
+                        </select>
+                    </div>
+                    <div class="form-section">
+                        <div style="padding: 10px; background: #f0f0f0; border-radius: 8px; margin-bottom: 15px;">
+                            <strong>Available Stock:</strong> <span id="availableStock" class="value">0</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantityOut">Quantity Sold *</label>
+                        <input type="number" id="quantityOut" name="quantityOut" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salePrice">Sale Price per Unit ($)</label>
+                        <input type="number" id="salePrice" name="salePrice" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="soldTo">Sold To</label>
+                        <input type="text" id="soldTo" name="soldTo" placeholder="Patient/Customer name">
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Additional notes"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">Record Sale</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Recent Sales Records</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Sale Price</th>
+                            <th>Sold To</th>
+                            <th>Recorded By</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script src="../js/api.js"></script>
-    <script src="../js/stockIn.js"></script>
     <script src="../js/auth.js"></script>
-  </body>
+    <script src="../js/stockOut.js"></script>
+</body>
 </html>

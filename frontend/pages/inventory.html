@@ -1,48 +1,117 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
-  <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - Clinic Daily</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
     <nav>
-      <strong>Clinic Daily</strong>
-      <div>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="inventory.html">Inventory</a>
-        <a href="stock-in.html">Stock In</a>
-        <a href="stock-out.html">Stock Out</a>
-        <a href="reports.html">Reports</a>
-        <a href="login.html" onclick="logoutUser()">Logout</a>
-      </div>
+        <div class="logo">📊 Clinic Daily</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="inventory.html" class="active">Inventory</a>
+            <a href="stock-in.html">Stock In</a>
+            <a href="stock-out.html">Stock Out</a>
+            <a href="reports.html">Reports</a>
+            <span style="margin-left: 20px;">|</span>
+            <span style="margin-left: 20px; font-size: 12px;">User: <span id="userEmail"></span></span>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
     </nav>
 
     <div class="container">
-      <div class="card">
-        <h1>Daily Overview</h1>
-        <div class="grid">
-          <div class="stat-box">
-            <h3>Total Items</h3>
-            <p>0</p>
-          </div>
-          <div class="stat-box">
-            <h3>Stock In Today</h3>
-            <p>0</p>
-          </div>
-          <div class="stat-box">
-            <h3>Stock Out Today</h3>
-            <p>0</p>
-          </div>
-          <div class="stat-box">
-            <h3>Total Sales</h3>
-            <p>0</p>
-          </div>
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Inventory Management</h2>
+                <button class="btn btn-primary" id="addItemBtn" onclick="openAddItemModal()" style="display: none;">+ Add Item</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Unit</th>
+                            <th>Current Stock</th>
+                            <th>Reorder Level</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Item</h3>
+                <button class="modal-close" onclick="closeAddItemModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" name="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="Medicines">Medicines</option>
+                            <option value="Supplies">Supplies</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit *</label>
+                        <select id="unit" name="unit" required>
+                            <option value="">-- Select Unit --</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Bottle">Bottle</option>
+                            <option value="Box">Box</option>
+                            <option value="Unit">Unit</option>
+                            <option value="Tube">Tube</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="openingStock">Opening Stock</label>
+                        <input type="number" id="openingStock" name="openingStock" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="reorderLevel">Reorder Level</label>
+                        <input type="number" id="reorderLevel" name="reorderLevel" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="unitCost">Unit Cost ($)</label>
+                        <input type="number" id="unitCost" name="unitCost" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier">Supplier</label>
+                        <input type="text" id="supplier" name="supplier">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddItemModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('addItemForm').dispatchEvent(new Event('submit'))">Add Item</button>
+            </div>
+        </div>
     </div>
 
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
-  </body>
+    <script src="../js/inventory.js"></script>
+</body>
 </html>

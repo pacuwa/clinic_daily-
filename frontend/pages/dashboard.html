@@ -1,29 +1,65 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Clinic Daily Login</title>
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
-  <body>
-    <div class="login-box">
-      <h2>Clinic Daily Login</h2>
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input id="email" type="email" required />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Clinic Daily</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">📊 Clinic Daily</div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="inventory.html">Inventory</a>
+            <a href="stock-in.html" id="stockInLink">Stock In</a>
+            <a href="stock-out.html">Stock Out</a>
+            <a href="reports.html">Reports</a>
+            <span style="margin-left: 20px;">|</span>
+            <span style="margin-left: 20px; font-size: 12px;">User: <span id="userEmail"></span></span>
+            <a href="#" onclick="logout()">Logout</a>
         </div>
+    </nav>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input id="password" type="password" required />
+    <div class="container">
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Daily Overview</h2>
+            </div>
+            
+            <div class="grid">
+                <div class="stat-box info">
+                    <h3>Total Items in Stock</h3>
+                    <p class="value" id="totalItems">0</p>
+                </div>
+                <div class="stat-box success">
+                    <h3>Stock In Today</h3>
+                    <p class="value" id="stockInToday">0</p>
+                </div>
+                <div class="stat-box warning">
+                    <h3>Stock Out Today</h3>
+                    <p class="value" id="stockOutToday">0</p>
+                </div>
+                <div class="stat-box danger">
+                    <h3>Total Sales Today</h3>
+                    <p class="value" id="totalSales">$0.00</p>
+                </div>
+            </div>
+
+            <div class="grid" style="margin-top: 20px;">
+                <div class="stat-box danger">
+                    <h3>⚠️ Low Stock Items</h3>
+                    <p class="value" id="lowStockCount">0</p>
+                </div>
+            </div>
         </div>
-
-        <button type="submit">Login</button>
-      </form>
     </div>
 
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
-  </body>
+    <script src="../js/dashboard.js"></script>
+</body>
 </html>

@@ -1,52 +1,63 @@
-const bcrypt = require('bcryptjs');
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
-const path = require('path');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Daily - Stock Inventory System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>Clinic Daily</h1>
+                <p>Stock Inventory Management System</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            
+            <div class="login-footer">
+                <p><strong>Demo Credentials:</strong></p>
+                <p>Admin: admin@clinic.com / admin123</p>
+                <p>Staff: staff@clinic.com / staff123</p>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
 
-const dbPath = path.join(__dirname, 'clinic_inventory.db');
-const schemaPath = path.join(__dirname, 'schema.sql');
-const seedPath = path.join(__dirname, 'seed-data.sql');
-
-const db = new sqlite3.Database(dbPath);
-
-const hashPassword = async (password) => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
-};
-
-const runSqlFile = (filePath) => {
-  const sql = fs.readFileSync(filePath, 'utf8');
-  return new Promise((resolve, reject) => {
-    db.exec(sql, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
-};
-
-(async () => {
-  try {
-    await runSqlFile(schemaPath);
-
-    const adminPassword = await hashPassword('admin123');
-    const staffPassword = await hashPassword('staff123');
-
-    db.run(
-      `INSERT OR IGNORE INTO users (email, password_hash, role, full_name) VALUES (?, ?, ?, ?)`,
-      ['admin@clinic.com', adminPassword, 'Admin', 'System Admin']
-    );
-
-    db.run(
-      `INSERT OR IGNORE INTO users (email, password_hash, role, full_name) VALUES (?, ?, ?, ?)`,
-      ['staff@clinic.com', staffPassword, 'Staff', 'Clinic Staff']
-    );
-
-    await runSqlFile(seedPath);
-
-    console.log('Seed data completed successfully.');
-    db.close();
-  } catch (error) {
-    console.error('Seed error:', error);
-    db.close();
-  }
-})();
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMessage');
+            
+            try {
+                const response = await apiRequest('/auth/login', 'POST', { email, password });
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', JSON.stringify(response.user));
+                errorMsg.style.display = 'none';
+                window.location.href = 'pages/dashboard.html';
+            } catch (error) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html>
