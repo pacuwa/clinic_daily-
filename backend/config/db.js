@@ -82,11 +82,11 @@ const dbConfig = process.env.DATABASE_URL
       ssl: { rejectUnauthorized: false }, // Required by Render PostgreSQL
     }
   : {
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 5432,
-      database: process.env.DB_NAME || 'clinic_inventory',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD,
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: Number(process.env.DATABASE_PORT) || 5432,
+      database: process.env.DATABASE_NAME || 'clinic_inventory',
+      user: process.env.DATABASE_USER || 'postgres',
+      password: process.env.DATABASE_PASSWORD,
     };
 
 const db = pgp(dbConfig);
