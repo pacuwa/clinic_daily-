@@ -1,30 +1,11 @@
-const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/auth');
+const express = require('express');
+const { validateLogin, handleValidationErrors } = require('../middleware/validation');
+const { loginUser, getProfile } = require('../controllers/authController');
+const { authenticate } = require('../middleware/auth');
 
-const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+const router = express.Router();
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Authentication required.' });
-  }
+router.post('/login', validateLogin, handleValidationErrors, loginUser);
+router.get('/profile', authenticate, getProfile);
 
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const decoded = jwt.verify(token, jwtSecret);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid or expired token.' });
-  }
-};
-
-const authorizeAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'Admin') {
-    return next();
-  }
-
-  return res.status(403).json({ message: 'Admin access required.' });
-};
-
-module.exports = { authenticate, authorizeAdmin };
+module.exports = router;

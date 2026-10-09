@@ -1,8 +1,13 @@
 const express = require('express');
-const { loginUser } = require('../controllers/authController');
+const { validateItem, handleValidationErrors } = require('../middleware/validation');
+const { getInventory, getItemById, addItem, updateItem } = require('../controllers/inventoryController');
+const { authenticate, authorizeAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/login', loginUser);
+router.get('/', authenticate, getInventory);
+router.get('/:id', authenticate, getItemById);
+router.post('/', authenticate, authorizeAdmin, validateItem, handleValidationErrors, addItem);
+router.put('/:id', authenticate, authorizeAdmin, updateItem);
 
 module.exports = router;

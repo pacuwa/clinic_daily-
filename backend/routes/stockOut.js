@@ -1,9 +1,11 @@
 const express = require('express');
-const { recordStockIn } = require('../controllers/stockController');
-const { authenticate, authorizeAdmin } = require('../middleware/auth');
+const { validateStockOut, handleValidationErrors } = require('../middleware/validation');
+const { recordStockOut, getStockOutHistory } = require('../controllers/stockController');
+const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/', authenticate, authorizeAdmin, recordStockIn);
+router.post('/', authenticate, validateStockOut, handleValidationErrors, recordStockOut);
+router.get('/', authenticate, getStockOutHistory);
 
 module.exports = router;
