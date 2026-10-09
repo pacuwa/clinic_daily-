@@ -1,35 +1,29 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+const pgp = require('pg-promise')();
+const dotenv = require('dotenv');
 
-const dbPath = path.join(__dirname, '../database/clinic_inventory.db');
-const schemaPath = path.join(__dirname, '../database/schema.sql');
+dotenv.config();
 
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to SQLite database.');
-  }
+const db = pgp({
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || 'clinic_inventory',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD,
 });
 
-const initializeDatabase = () => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(schemaPath, 'utf8', (err, schemaSql) => {
-      if (err) {
-        reject(err);
-        return;
-      }
+const initializeDatabase = async () => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const schemaPath = path.join(__dirname, '../database/schema.sql');
+    const schema = fs.readFileSync(schemaPath, 'utf8');
 
-      db.exec(schemaSql, (execError) => {
-        if (execError) {
-          reject(execError);
-          return;
-        }
-        resolve();
-      });
-    });
-  });
+    await db.none(schema);
+    console.log('Connected to PostgreSQL database and schema initialized.');
+  } catch (error) {
+    console.error('Error initializing database:', error.message);
+    throw error;
+  }
 };
 
 const getDb = () => db;
