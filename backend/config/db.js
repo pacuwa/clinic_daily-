@@ -3,15 +3,27 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 
-dotenv.config();
+// Load local .env file only in development
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
-const db = pgp({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-});
+// 1. Prefer DATABASE_URL for production (Render / Managed PostgreSQL)
+// 2. Fall back to individual DB_* variables for local development
+const dbConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }, // Required by Render PostgreSQL
+    }
+  : {
+      host: process.env.DB_HOST || 'localhost',
+      port: Number(process.env.DB_PORT) || 5432,
+      database: process.env.DB_NAME || 'clinic_inventory',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+    };
+
+const db = pgp(dbConfig);
 
 const initializeDatabase = async () => {
   try {
