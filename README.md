@@ -1,56 +1,46 @@
 # Clinic Daily Stock Inventory System
 
-A web-based stock inventory management system designed for clinics/pharmacies with role-based access for admin and staff.
+A real web application for clinic inventory management with role-based access for admin and staff.
 
 ## Features
 
-### Admin Features
-- Login with secure authentication
-- Enter and manage stock inventory
-- View all stock transactions
-- Generate daily/weekly/monthly reports
-- Track stock in and stock out
-- User management
+- Admin login and staff login
+- Inventory management
+- Stock in and stock out tracking
+- Daily sales and inventory reporting
+- Role-based access control
+- SQLite database for lightweight local deployment
 
-### Staff Features
-- Login with credentials
-- View available stock levels
-- Record stock sales (stock out)
-- View daily sales activity
-- Generate personal sales reports
+## Recommended stack
 
-## System Architecture
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js + Express
+- Database: SQLite
+- Authentication: JWT
 
-```
-clinic_daily/
-├── frontend/                 # Vue.js/React dashboard
-├── backend/                  # Node.js/Flask API
-├── database/                 # SQLite database
-├── reports/                  # Report generation
-└── docs/                     # Documentation
-```
+## App architecture
 
-## Technology Stack
+- `backend/` — REST API and business logic
+- `frontend/` — pages and UI scripts
+- `database/` — schema and seed data
+- `docs/` — usage and API docs
 
-- **Frontend**: HTML5, CSS3, JavaScript (with optional Vue.js/React)
-- **Backend**: Node.js with Express OR Python with Flask
-- **Database**: SQLite (lightweight, no setup required)
-- **Reports**: Chart.js for visualizations, PDF export capability
-- **Authentication**: JWT tokens for secure sessions
+## Default users
 
-## Getting Started
+- Admin: admin@clinic.com / admin123
+- Staff: staff@clinic.com / staff123
 
-1. Clone the repository
-2. Install dependencies
-3. Configure environment variables
-4. Run the application
-5. Access at `http://localhost:3000`
+## Run locally
 
-## Default Credentials
+1. Install dependencies:
+   npm install
+2. Copy environment file:
+   cp .env.example .env
+3. Start the server:
+   npm run dev
+4. Open in browser:
+   http://localhost:3000
 
-- Admin: `admin@clinic.com` / `admin123`
-- Staff: `staff@clinic.com` / `staff123`
+## Project status
 
-## Project Status
-
-🚀 **In Development** - Core features being built
+This scaffold establishes the initial architecture and starter code for development.

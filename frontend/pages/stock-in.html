@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inventory</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <nav>
+      <strong>Clinic Daily</strong>
+      <div>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="inventory.html">Inventory</a>
+        <a href="stock-in.html">Stock In</a>
+        <a href="stock-out.html">Stock Out</a>
+        <a href="reports.html">Reports</a>
+        <a href="login.html" onclick="logoutUser()">Logout</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="card">
+        <h1>Inventory</h1>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Unit</th>
+                <th>Current Stock</th>
+                <th>Reorder Level</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/inventory.js"></script>
+    <script src="../js/auth.js"></script>
+  </body>
+</html>

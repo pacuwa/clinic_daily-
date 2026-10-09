@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stock In</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <nav>
+      <strong>Clinic Daily</strong>
+      <div>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="inventory.html">Inventory</a>
+        <a href="stock-in.html">Stock In</a>
+        <a href="stock-out.html">Stock Out</a>
+        <a href="reports.html">Reports</a>
+        <a href="login.html" onclick="logoutUser()">Logout</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="card">
+        <h1>Stock In</h1>
+        <form id="stockInForm">
+          <div class="form-group">
+            <label for="itemId">Item ID</label>
+            <input id="itemId" type="number" required />
+          </div>
+          <div class="form-group">
+            <label for="quantityIn">Quantity In</label>
+            <input id="quantityIn" type="number" required />
+          </div>
+          <div class="form-group">
+            <label for="supplier">Supplier</label>
+            <input id="supplier" type="text" />
+          </div>
+          <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" rows="4"></textarea>
+          </div>
+          <button type="submit">Record Stock In</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/stockIn.js"></script>
+    <script src="../js/auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+document.addEventListener('DOMContentLoaded', async () => {
+  const token = localStorage.getItem('token');
+  const reportBox = document.getElementById('dailyReport');
+
+  if (!token || !reportBox) return;
+
+  try {
+    const report = await window.apiRequest('/reports/daily', 'GET', null, token);
+    reportBox.textContent = `Total sold today: ${report.total_quantity_out} items | Total sales: ${report.total_sales}`;
+  } catch (error) {
+    reportBox.textContent = 'Unable to load daily report.';
+  }
+});
