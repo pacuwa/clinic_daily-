@@ -36,11 +36,17 @@ const authorizeStaff = (req, res, next) => {
   return res.status(403).json({ message: 'Staff access required.' });
 };
 
-const checkUserStatus = (req, res, next) => {
-  const db = getDb();
+const checkUserStatus = async (req, res, next) => {
+  try {
+    const db = getDb();
 
-  db.get('SELECT status FROM users WHERE id = ?', [req.user.id], (err, user) => {
-    if (err || !user) {
+    // Use pg-promise's oneOrNone method with PostgreSQL placeholder syntax ($1)
+    const user = await db.oneOrNone(
+      'SELECT status FROM users WHERE id = $1',
+      [req.user.id]
+    );
+
+    if (!user) {
       return res.status(401).json({ message: 'User not found or access denied.' });
     }
 
@@ -49,7 +55,10 @@ const checkUserStatus = (req, res, next) => {
     }
 
     next();
-  });
+  } catch (error) {
+    console.error('Database error in checkUserStatus:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
 module.exports = { authenticate, authorizeAdmin, authorizeStaff, checkUserStatus };
