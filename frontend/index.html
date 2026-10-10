@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinic Daily - Stock Inventory System</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Optional: Add FontAwesome for the show/hide password eye icon if not already included -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .password-container {
+            position: relative;
+        }
+        .password-container input {
+            width: 100%;
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        .forgot-password-link {
+            display: block;
+            text-align: right;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .forgot-password-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -22,7 +54,13 @@
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <button type="button" id="togglePasswordBtn" class="toggle-password" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <a href="#" id="forgotPasswordLink" class="forgot-password-link">Forgot Password?</a>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
@@ -34,28 +72,92 @@
                 <p>Staff: staff@clinic.com / staff123</p>
             </div>
             
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="errorMessage" class="error-message" style="display: none; color: red; margin-top: 10px;"></div>
+            <div id="successMessage" class="success-message" style="display: none; color: green; margin-top: 10px;"></div>
         </div>
+    </div>
+
+    <!-- Modal / Section for Reset Password (Hidden by default) -->
+    <div id="resetModal" style="display: none; margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+        <h3>Reset Password</h3>
+        <p style="font-size: 0.9rem; color: #555;">Enter your email address and we'll send instructions to reset your password.</p>
+        <form id="resetForm">
+            <div class="form-group" style="margin-bottom: 10px;">
+                <input type="email" id="resetEmail" name="email" placeholder="Enter your email" required style="width: 100%; padding: 8px;">
+            </div>
+            <button type="submit" class="btn btn-secondary" style="padding: 6px 12px;">Send Reset Link</button>
+            <button type="button" id="cancelResetBtn" class="btn" style="padding: 6px 12px; background: transparent; border: none; cursor: pointer;">Cancel</button>
+        </form>
     </div>
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
+        // Toggle Password Visibility
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+
+        // Show/Hide Reset Password Form
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const resetModal = document.getElementById('resetModal');
+        const cancelResetBtn = document.getElementById('cancelResetBtn');
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetModal.style.display = 'block';
+        });
+
+        cancelResetBtn.addEventListener('click', () => {
+            resetModal.style.display = 'none';
+        });
+
+        // Handle Reset Password Submission
+        document.getElementById('resetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value;
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+
+            try {
+                // Adjust endpoint name to match your backend auth routes if necessary (e.g., /auth/forgot-password)
+                await apiRequest('/auth/forgot-password', 'POST', { email });
+                successMsg.style.display = 'block';
+                successMsg.textContent = 'Password reset instructions have been sent to your email.';
+                resetModal.style.display = 'none';
+                errorMsg.style.display = 'none';
+            } catch (error) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = error.message || 'Failed to send reset link.';
+            }
+        });
+
+        // Handle Login Submission
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
             
             try {
                 const response = await apiRequest('/auth/login', 'POST', { email, password });
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('user', JSON.stringify(response.user));
                 errorMsg.style.display = 'none';
+                successMsg.style.display = 'none';
                 window.location.href = 'pages/dashboard.html';
             } catch (error) {
                 errorMsg.style.display = 'block';
                 errorMsg.textContent = error.message;
+                successMsg.style.display = 'none';
             }
         });
     </script>
