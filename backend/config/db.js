@@ -56,7 +56,7 @@ const initializeDatabase = async () => {
     // Automatically insert default admin user on fresh database setup
     await db.none(`
       INSERT INTO users (email, password_hash, role, full_name, status) 
-      VALUES ('admin@clinic.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'Dr. Sarah Admin', 'Active')
+      VALUES ('admin@clinic.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'Dr. Stephen Admin', 'Active')
       ON CONFLICT (email) DO NOTHING;
     `);
     console.log('✓ Default admin user created (email: admin@clinic.com, password: password123)');
