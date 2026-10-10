@@ -106,6 +106,35 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email address is required.' });
+    }
+
+    // Check if the user exists in the database
+    const user = await db.oneOrNone('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (!user) {
+      console.log(`Password reset requested for non-existent email: ${email}`);
+    } else {
+      console.log(`Password reset instructions requested for valid user: ${email}`);
+    }
+
+    // Always respond successfully to protect user privacy (prevents email enumeration attacks)
+    res.json({ 
+      message: 'If an account with that email exists, password reset instructions have been sent.' 
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Internal server error during password reset.' });
+  }
+});
+
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
   res.json({ message: 'Logged out successfully.' });
