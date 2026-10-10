@@ -31,13 +31,13 @@ const getDailyReport = async (req, res) => {
       data: {
         report_date: today,
         stock_in: {
-          total_transactions: dailyStockInRow?.total_transactions || 0,
-          total_quantity: dailyStockInRow?.total_quantity_in || 0
+          total_transactions: Number(dailyStockInRow?.total_transactions) || 0,
+          total_quantity: Number(dailyStockInRow?.total_quantity_in) || 0
         },
         stock_out: {
-          total_transactions: dailySalesRow?.total_transactions || 0,
-          total_quantity: dailySalesRow?.total_quantity_out || 0,
-          total_sales: dailySalesRow?.total_sales || 0
+          total_transactions: Number(dailySalesRow?.total_transactions) || 0,
+          total_quantity: Number(dailySalesRow?.total_quantity_out) || 0,
+          total_sales: Number(dailySalesRow?.total_sales) || 0
         }
       }
     });
@@ -63,14 +63,20 @@ const getWeeklyReport = async (req, res) => {
       []
     );
 
-    const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity_out || 0), 0);
-    const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
+    const formattedRows = rows.map(row => ({
+      ...row,
+      total_quantity_out: Number(row.total_quantity_out) || 0,
+      total_sales: Number(row.total_sales) || 0
+    }));
+
+    const totalQuantity = formattedRows.reduce((sum, row) => sum + row.total_quantity_out, 0);
+    const totalSales = formattedRows.reduce((sum, row) => sum + row.total_sales, 0);
 
     return res.json({
       message: 'Weekly report generated successfully',
       data: {
         period: 'Last 7 days',
-        daily_breakdown: rows || [],
+        daily_breakdown: formattedRows,
         summary: {
           total_quantity: totalQuantity,
           total_sales: totalSales
@@ -99,14 +105,20 @@ const getMonthlyReport = async (req, res) => {
       []
     );
 
-    const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity_out || 0), 0);
-    const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
+    const formattedRows = rows.map(row => ({
+      ...row,
+      total_quantity_out: Number(row.total_quantity_out) || 0,
+      total_sales: Number(row.total_sales) || 0
+    }));
+
+    const totalQuantity = formattedRows.reduce((sum, row) => sum + row.total_quantity_out, 0);
+    const totalSales = formattedRows.reduce((sum, row) => sum + row.total_sales, 0);
 
     return res.json({
       message: 'Monthly report generated successfully',
       data: {
         period: 'Last 30 days',
-        daily_breakdown: rows || [],
+        daily_breakdown: formattedRows,
         summary: {
           total_quantity: totalQuantity,
           total_sales: totalSales
@@ -142,9 +154,16 @@ const getStockLevelsReport = async (req, res) => {
       []
     );
 
-    const lowStock = rows.filter(r => r.status === 'LOW').length;
-    const moderateStock = rows.filter(r => r.status === 'MODERATE').length;
-    const goodStock = rows.filter(r => r.status === 'GOOD').length;
+    const formattedRows = rows.map(row => ({
+      ...row,
+      current_stock: Number(row.current_stock) || 0,
+      reorder_level: Number(row.reorder_level) || 0,
+      unit_cost: Number(row.unit_cost) || 0
+    }));
+
+    const lowStock = formattedRows.filter(r => r.status === 'LOW').length;
+    const moderateStock = formattedRows.filter(r => r.status === 'MODERATE').length;
+    const goodStock = formattedRows.filter(r => r.status === 'GOOD').length;
 
     return res.json({
       message: 'Stock levels report generated successfully',
@@ -153,9 +172,9 @@ const getStockLevelsReport = async (req, res) => {
           low_stock: lowStock,
           moderate_stock: moderateStock,
           good_stock: goodStock,
-          total_items: rows.length
+          total_items: formattedRows.length
         },
-        items: rows || []
+        items: formattedRows
       }
     });
   } catch (error) {
@@ -183,18 +202,25 @@ const getCategoryReport = async (req, res) => {
       [today]
     );
 
-    const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
-    const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity || 0), 0);
+    const formattedRows = rows.map(row => ({
+      ...row,
+      total_transactions: Number(row.total_transactions) || 0,
+      total_quantity: Number(row.total_quantity) || 0,
+      total_sales: Number(row.total_sales) || 0
+    }));
+
+    const totalSales = formattedRows.reduce((sum, row) => sum + row.total_sales, 0);
+    const totalQuantity = formattedRows.reduce((sum, row) => sum + row.total_quantity, 0);
 
     return res.json({
       message: 'Category report generated successfully',
       data: {
         report_date: today,
-        categories: rows || [],
+        categories: formattedRows,
         summary: {
           total_quantity: totalQuantity,
           total_sales: totalSales,
-          total_categories: rows.length
+          total_categories: formattedRows.length
         }
       }
     });
@@ -227,24 +253,32 @@ const getItemReport = async (req, res) => {
       [today]
     );
 
-    const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
-    const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity || 0), 0);
-    const totalProfit = rows.reduce((sum, row) => {
-      const cost = (row.unit_cost || 0) * (row.total_quantity || 0);
-      const sales = row.total_sales || 0;
-      return sum + (sales - cost);
+    const formattedRows = rows.map(row => ({
+      ...row,
+      total_transactions: Number(row.total_transactions) || 0,
+      total_quantity: Number(row.total_quantity) || 0,
+      unit_cost: Number(row.unit_cost) || 0,
+      total_sale_price: Number(row.total_sale_price) || 0,
+      total_sales: Number(row.total_sales) || 0
+    }));
+
+    const totalSales = formattedRows.reduce((sum, row) => sum + row.total_sales, 0);
+    const totalQuantity = formattedRows.reduce((sum, row) => sum + row.total_quantity, 0);
+    const totalProfit = formattedRows.reduce((sum, row) => {
+      const cost = row.unit_cost * row.total_quantity;
+      return sum + (row.total_sales - cost);
     }, 0);
 
     return res.json({
       message: 'Item report generated successfully',
       data: {
         report_date: today,
-        items: rows || [],
+        items: formattedRows,
         summary: {
           total_quantity: totalQuantity,
           total_sales: totalSales,
           total_profit: totalProfit,
-          total_items_sold: rows.length
+          total_items_sold: formattedRows.length
         }
       }
     });
@@ -272,14 +306,20 @@ const getWeeklyDetailedReport = async (req, res) => {
       []
     );
 
-    const totalSales = rows.reduce((sum, row) => sum + (row.total_sales || 0), 0);
-    const totalQuantity = rows.reduce((sum, row) => sum + (row.total_quantity || 0), 0);
+    const formattedRows = rows.map(row => ({
+      ...row,
+      total_quantity: Number(row.total_quantity) || 0,
+      total_sales: Number(row.total_sales) || 0
+    }));
+
+    const totalSales = formattedRows.reduce((sum, row) => sum + row.total_sales, 0);
+    const totalQuantity = formattedRows.reduce((sum, row) => sum + row.total_quantity, 0);
 
     return res.json({
       message: 'Weekly detailed report generated successfully',
       data: {
         period: 'Last 7 days',
-        breakdown: rows || [],
+        breakdown: formattedRows,
         summary: {
           total_quantity: totalQuantity,
           total_sales: totalSales
