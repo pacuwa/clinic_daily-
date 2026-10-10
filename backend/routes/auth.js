@@ -2,10 +2,59 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { db } = require('../config/db'); // Adjust path to your db.js if needed
+const { db } = require('../config/db');
 
 // Secret key for JWT (uses environment variable or a fallback for dev)
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_here';
+
+// POST /api/auth/register
+router.post('/register', async (req, res) => {
+  try {
+    const { email, password, full_name, role } = req.body;
+
+    if (!email || !password || !full_name) {
+      return res.status(400).json({ message: 'Email, password, and full name are required.' });
+    }
+
+    // Check if user already exists
+    const existingUser = await db.oneOrNone('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingUser) {
+      return res.status(400).json({ message: 'A user with this email is already registered.' });
+    }
+
+    // Hash the password securely
+    const saltRounds = 10;
+    const password_hash = await bcrypt.hash(password, saltRounds);
+
+    // Default role to 'Staff' unless 'Admin' is explicitly requested
+    const userRole = role === 'Admin' ? 'Admin' : 'Staff';
+
+    // Insert new user into database and return user details (excluding password)
+    const newUser = await db.one(
+      `INSERT INTO users (email, password_hash, role, full_name, status) 
+       VALUES ($1, $2, $3, $4, 'Active') 
+       RETURNING id, email, role, full_name, status, created_at`,
+      [email, password_hash, userRole, full_name]
+    );
+
+    // Generate JWT token (expires in 24 hours)
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
+      message: 'Registration successful',
+      token,
+      user: newUser,
+    });
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Internal server error during registration.' });
+  }
+});
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -59,8 +108,6 @@ router.post('/login', async (req, res) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  // Since JWT is stateless, logout is typically handled on the frontend 
-  // by clearing localStorage, but we provide this endpoint for completeness.
   res.json({ message: 'Logged out successfully.' });
 });
 
