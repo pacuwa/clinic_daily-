@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS items (
     item_name VARCHAR(255) UNIQUE NOT NULL,
     category VARCHAR(100) NOT NULL,
     unit VARCHAR(50) NOT NULL,
+    unit_cost DECIMAL(10, 2) NOT NULL, 
     opening_stock INTEGER DEFAULT 0 CHECK (opening_stock >= 0),
     current_stock INTEGER DEFAULT 0 CHECK (current_stock >= 0),
     reorder_level INTEGER DEFAULT 0 CHECK (reorder_level >= 0),
