@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userEmail = document.getElementById('userEmail');
     if (userEmail) userEmail.textContent = user.email;
 
-    // Hide Stock In link for Staff
+    // Hide Stock In link for Staff inside the dropdown
     if (!isAdmin()) {
         const stockInLink = document.getElementById('stockInLink');
         if (stockInLink) {
@@ -28,7 +28,11 @@ async function loadDashboardData() {
         document.getElementById('totalItems').textContent = inventory.data.length;
         document.getElementById('stockInToday').textContent = dailyReport.data.stock_in.total_quantity || 0;
         document.getElementById('stockOutToday').textContent = dailyReport.data.stock_out.total_quantity || 0;
-        document.getElementById('totalSales').textContent = '$' + (dailyReport.data.stock_out.total_sales || 0).toFixed(2);
+        
+        // Formatted to match your Ugx currency styling
+        const totalSales = dailyReport.data.stock_out.total_sales || 0;
+        document.getElementById('totalSales').textContent = 'Ugx' + totalSales.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
         document.getElementById('lowStockCount').textContent = stockLevels.data.summary.low_stock;
     } catch (error) {
         console.error('Error loading dashboard:', error);
