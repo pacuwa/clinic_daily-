@@ -5,74 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Clinic Daily</title>
     <link rel="stylesheet" href="../css/style.css">
-    <style>
-        /* Dropdown container */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        /* The 3-dot button */
-        .dropdown-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            color: inherit;
-            padding: 4px 10px;
-            border-radius: 4px;
-            transition: background 0.2s ease;
-        }
-
-        .dropdown-btn:hover {
-            background-color: rgba(0, 0, 0, 0.08);
-        }
-
-        /* Hidden popup menu by default */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: #ffffff;
-            min-width: 160px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-            border-radius: 6px;
-            z-index: 1000;
-            overflow: hidden;
-            margin-top: 6px;
-        }
-
-        /* Dropdown menu items */
-        .dropdown-menu a {
-            color: #333333;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 14px;
-            transition: background 0.2s ease;
-        }
-
-        .dropdown-menu a:hover {
-            background-color: #f1f5f9;
-        }
-
-        /* Active class applied via JS */
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        /* User section spacing adjustments */
-        .user-divider {
-            margin: 0 12px;
-        }
-
-        .user-info {
-            font-size: 12px;
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body>
     <nav>
@@ -80,12 +12,11 @@
         <div class="nav-links">
             <a href="dashboard.html" class="active">Dashboard</a>
             
-            <!-- User Email moved to Inventory's former position -->
             <span class="user-info">User: <span id="userEmail"></span></span>
             
-            <!-- 3-Dot Dropdown Menu (Containing Inventory, Stock In, Stock Out, Reports, Logout) -->
+            <!-- 3-Dot Dropdown Menu -->
             <div class="dropdown">
-                <button class="dropdown-btn" onclick="toggleDropdown(event)" title="More options">⋮</button>
+                <button class="dropdown-btn" id="dropdownBtn" title="More options">⋮</button>
                 <div class="dropdown-menu" id="navDropdown">
                     <a href="inventory.html">Inventory</a>
                     <a href="stock-in.html" id="stockInLink">Stock In</a>
@@ -137,20 +68,5 @@
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/dashboard.js"></script>
-    <script>
-        function toggleDropdown(event) {
-            event.stopPropagation();
-            const menu = document.getElementById('navDropdown');
-            menu.classList.toggle('show');
-        }
-
-        // Close dropdown when clicking anywhere outside
-        window.addEventListener('click', function(event) {
-            const menu = document.getElementById('navDropdown');
-            if (menu && menu.classList.contains('show')) {
-                menu.classList.remove('show');
-            }
-        });
-    </script>
 </body>
 </html>
