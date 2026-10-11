@@ -5,12 +5,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const userEmail = document.getElementById('userEmail');
     if (userEmail) userEmail.textContent = user.email;
 
-    // Hide Stock In link for Staff inside the dropdown
+    // Hide Stock In link for Non-Admin staff
     if (!isAdmin()) {
         const stockInLink = document.getElementById('stockInLink');
         if (stockInLink) {
             stockInLink.style.display = 'none';
         }
+    }
+
+    // Toggle Dropdown Menu
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const navDropdown = document.getElementById('navDropdown');
+
+    if (dropdownBtn && navDropdown) {
+        dropdownBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            navDropdown.classList.toggle('show');
+        });
+
+        // Close when clicking anywhere outside
+        window.addEventListener('click', (event) => {
+            if (!navDropdown.contains(event.target) && event.target !== dropdownBtn) {
+                navDropdown.classList.remove('show');
+            }
+        });
     }
 
     loadDashboardData();
@@ -29,7 +47,6 @@ async function loadDashboardData() {
         document.getElementById('stockInToday').textContent = dailyReport.data.stock_in.total_quantity || 0;
         document.getElementById('stockOutToday').textContent = dailyReport.data.stock_out.total_quantity || 0;
         
-        // Formatted to match your Ugx currency styling
         const totalSales = dailyReport.data.stock_out.total_sales || 0;
         document.getElementById('totalSales').textContent = 'Ugx' + totalSales.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
