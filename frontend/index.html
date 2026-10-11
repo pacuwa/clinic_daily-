@@ -3,176 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinic Daily - Stock Inventory System</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Dashboard - Clinic Daily</title>
+    <link rel="stylesheet" href="../css/style.css">
     <style>
-        .password-container {
+        /* Dropdown container */
+        .dropdown {
             position: relative;
+            display: inline-block;
         }
-        .password-container input {
-            width: 100%;
-            padding-right: 40px;
-        }
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+
+        /* The 3-dot button */
+        .dropdown-btn {
             background: none;
             border: none;
+            font-size: 20px;
+            font-weight: bold;
             cursor: pointer;
-            color: #666;
+            color: inherit;
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
         }
-        .forgot-password-link {
-            display: block;
-            text-align: right;
-            font-size: 0.85rem;
-            margin-top: 5px;
-            color: #0066cc;
+
+        .dropdown-btn:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* Hidden popup menu by default */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+            z-index: 1000;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        /* Dropdown menu items */
+        .dropdown-menu a {
+            color: #333333;
+            padding: 10px 16px;
             text-decoration: none;
-        }
-        .forgot-password-link:hover {
-            text-decoration: underline;
-        }
-        .register-link {
             display: block;
-            text-align: center;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            color: #0066cc;
-            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.2s ease;
         }
-        .register-link:hover {
-            text-decoration: underline;
+
+        .dropdown-menu a:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Active class applied via JS */
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        /* User section spacing adjustments */
+        .user-divider {
+            margin: 0 12px;
+        }
+
+        .user-info {
+            font-size: 12px;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
-            <div class="login-header">
-                <h1>Clinic Daily</h1>
-                <p>Stock Inventory Management System</p>
+    <nav>
+        <div class="logo">📊 Clinic Daily</div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            
+            <!-- User Email moved to Inventory's former position -->
+            <span class="user-info">User: <span id="userEmail"></span></span>
+            
+            <!-- 3-Dot Dropdown Menu (Containing Inventory, Stock In, Stock Out, Reports, Logout) -->
+            <div class="dropdown">
+                <button class="dropdown-btn" onclick="toggleDropdown(event)" title="More options">⋮</button>
+                <div class="dropdown-menu" id="navDropdown">
+                    <a href="inventory.html">Inventory</a>
+                    <a href="stock-in.html" id="stockInLink">Stock In</a>
+                    <a href="stock-out.html">Stock Out</a>
+                    <a href="reports.html">Reports</a>
+                    <a href="#" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Daily Overview</h2>
             </div>
             
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <div class="grid">
+                <div class="stat-box info">
+                    <h3>Total Items in Stock</h3>
+                    <p class="value" id="totalItems">0</p>
                 </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="password-container">
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                        <button type="button" id="togglePasswordBtn" class="toggle-password" aria-label="Toggle password visibility">
-                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
-                        </button>
-                    </div>
-                    <a href="#" id="forgotPasswordLink" class="forgot-password-link">Forgot Password?</a>
+                <div class="stat-box success">
+                    <h3>Stock In Today</h3>
+                    <p class="value" id="stockInToday">0</p>
                 </div>
-                
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
-            </form>
-            
-            <!-- Link pointing to your register page -->
-            <a href="pages/register.html" class="register-link">Don't have an account? Register here</a>
-            
-            <div class="login-footer" style="margin-top: 20px;">
+                <div class="stat-box warning">
+                    <h3>Stock Out Today</h3>
+                    <p class="value" id="stockOutToday">0</p>
+                </div>
+                <div class="stat-box danger">
+                    <h3>Total Sales Today</h3>
+                    <p class="value" id="totalSales">Ugx0.00</p>
+                </div>
             </div>
-            
-            <div id="errorMessage" class="error-message" style="display: none; color: red; margin-top: 10px;"></div>
-            <div id="successMessage" class="success-message" style="display: none; color: green; margin-top: 10px;"></div>
+
+            <div class="grid" style="margin-top: 20px;">
+                <div class="stat-box danger">
+                    <h3>⚠️ Low Stock Items</h3>
+                    <p class="value" id="lowStockCount">0</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Reset Password Modal / Section -->
-    <div id="resetModal" style="display: none; margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 5px;">
-        <h3>Reset Password</h3>
-        <p style="font-size: 0.9rem; color: #555;">Enter your email address and we'll send instructions to reset your password.</p>
-        <form id="resetForm">
-            <div class="form-group" style="margin-bottom: 10px;">
-                <input type="email" id="resetEmail" name="email" placeholder="Enter your email" required style="width: 100%; padding: 8px;">
-            </div>
-            <button type="submit" class="btn btn-secondary" style="padding: 6px 12px;">Send Reset Link</button>
-            <button type="button" id="cancelResetBtn" class="btn" style="padding: 6px 12px; background: transparent; border: none; cursor: pointer;">Cancel</button>
-        </form>
-    </div>
-
-    <script src="js/api.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
     <script>
-        // Toggle Password Visibility
-        const passwordInput = document.getElementById('password');
-        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-        const eyeIcon = document.getElementById('eyeIcon');
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('navDropdown');
+            menu.classList.toggle('show');
+        }
 
-        togglePasswordBtn.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            eyeIcon.classList.toggle('fa-eye');
-            eyeIcon.classList.toggle('fa-eye-slash');
-        });
-
-        // Show/Hide Reset Password Form
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        const resetModal = document.getElementById('resetModal');
-        const cancelResetBtn = document.getElementById('cancelResetBtn');
-
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            resetModal.style.display = 'block';
-        });
-
-        cancelResetBtn.addEventListener('click', () => {
-            resetModal.style.display = 'none';
-        });
-
-        // Handle Reset Password Submission
-        document.getElementById('resetForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('resetEmail').value;
-            const successMsg = document.getElementById('successMessage');
-            const errorMsg = document.getElementById('errorMessage');
-
-            try {
-                await apiRequest('/auth/forgot-password', 'POST', { email });
-                successMsg.style.display = 'block';
-                successMsg.textContent = 'Password reset instructions sent to your email.';
-                resetModal.style.display = 'none';
-                errorMsg.style.display = 'none';
-            } catch (error) {
-                errorMsg.style.display = 'block';
-                errorMsg.textContent = error.message || 'Failed to send reset link.';
-            }
-        });
-
-        // Handle Login Submission
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('errorMessage');
-            const successMsg = document.getElementById('successMessage');
-            
-            try {
-                const response = await apiRequest('/auth/login', 'POST', { email, password });
-                
-                localStorage.setItem('token', response.token);
-                localStorage.setItem('user', JSON.stringify(response.user));
-                
-                errorMsg.style.display = 'none';
-                successMsg.style.display = 'block';
-                successMsg.textContent = 'Login successful! Redirecting...';
-
-                setTimeout(() => {
-                    window.location.href = 'pages/dashboard.html';
-                }, 800);
-
-            } catch (error) {
-                successMsg.style.display = 'none';
-                errorMsg.style.display = 'block';
-                errorMsg.textContent = error.message || 'Invalid email or password.';
+        // Close dropdown when clicking anywhere outside
+        window.addEventListener('click', function(event) {
+            const menu = document.getElementById('navDropdown');
+            if (menu && menu.classList.contains('show')) {
+                menu.classList.remove('show');
             }
         });
     </script>
